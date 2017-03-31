@@ -1,0 +1,19 @@
+version: "1"
+
+vars:
+  DERP: "duup"
+  BIN: "honey"
+
+targets:
+  build:
+    deps: 
+      - test
+    actions:
+      - echo -n "hello {{.BIN}}"
+      - echo -n "{{.DERP}}"
+
+  test:
+    actions:
+      - echo -n "{{.DERP}}"
+    vars:
+      DERP: "narf"
