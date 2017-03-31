@@ -1,3 +1,5 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # honey-do
 **Honey-Do** is a simple build / automation tool written entirely in Go. The primary goal is to be an easier and cross-platform alternative to GNU Make. The name is based on the concept of a **_"honey do" list_**.
 
