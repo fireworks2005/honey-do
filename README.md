@@ -23,26 +23,48 @@ vars:
   BIN: "honey"
 
 targets:
+  
+
   build:
     deps: 
       - test
     actions:
       - echo -n "hello {{.BIN}}"
       - echo -n "{{.DERP}}"
+    platforms:
+      "!windows":
+        actions:
+          - echo -n "hello for {{.DERP}}"
+        vars:
+          DERP: "not windows"
+
+      windows:
+        actions:
+          - echo -n "hello for {{.DERP}}"
+        vars:
+          DERP: "windows"
+
+      darwin:
+        actions:
+          - echo -n "hello for {{.DERP}}"
+        vars:
+          DERP: "macOS"
 
   test:
     actions:
       - echo -n "{{.DERP}}"
     vars:
       DERP: "narf"
+
 ```
 
-### Running the sample
+### Running the sample (macOS)
 
 ```bash
-$ honey 
 INFO[0000] narf
 INFO[0000] dependency target test complete
+INFO[0000] hello for not windows
+INFO[0000] hello for macOS
 INFO[0000] hello honey
 INFO[0000] duup
 INFO[0000] target build complete
@@ -55,6 +77,9 @@ If no targets are specified, ```all``` is assumed. Not that ```all``` is also a 
 The ```actions``` are passed through the [Go text/template engine](https://golang.org/pkg/text/template/) prior to execution. There should be a valid ```VAR``` set for every ```{{.VAR}}```. If there is no set var, the output will show ```<no value>``` in place of the ```{{.VAR}}```.
 
 There are 2 levels of variables. The **global-level** is defined outside of the ```targets``` via ```vars```. The **target-level** is defined within a target. The **target-level** variables will override the **global-level** if they share the same name. This can be seen in the sample above with the variable ```DERP```. 
+
+### Platforms
+```platforms``` have the ability to run ```actions``` and set ```vars``` specific to an OS. This uses the result of the Go var ```runtime.GOOS``` (see [pkg/runtime](https://golang.org/pkg/runtime/#pkg-constants)). To run for any platform except for a specific one, the key needs to be wrapped in double quotes and prefixed with **!** (**e.g.** ```"!windows"``` will run on all platforms except Windows).
 
 ## Additional Notes
 Similar to GNU Make, each action is run in its own ```shell```. If 4 actions are specified like:
@@ -79,7 +104,7 @@ vars:
 ```
 
 ## TODOs
-* OS specific actions
+* ~~OS specific actions~~
 * Set a **working directory** for a given target
 
 
