@@ -37,18 +37,9 @@ func (p *Platform) Run() error {
 }
 
 func (p *Platform) PrepDoers() ([]*Doer, error) {
-	vars := make(map[string]string)
-	for k, v := range hf.Vars {
-		vars[k] = v
-	}
-
-	for k, v := range p.Vars {
-		vars[k] = v
-	}
-
 	doers := make([]*Doer, 0)
 	for _, a := range p.Actions {
-		raw, err := enrich(a, vars)
+		raw, err := enrich(a, vars(p.Vars))
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to enrich action")
 		}

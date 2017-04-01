@@ -5,9 +5,6 @@
 package honey
 
 import (
-	"bytes"
-	"text/template"
-
 	"github.com/elliottpolk/honey-do/log"
 
 	"github.com/pkg/errors"
@@ -76,18 +73,9 @@ func (t *Target) RunDeps() error {
 }
 
 func (t *Target) PrepDoers() ([]*Doer, error) {
-	vars := make(map[string]string)
-	for k, v := range hf.Vars {
-		vars[k] = v
-	}
-
-	for k, v := range t.Vars {
-		vars[k] = v
-	}
-
 	doers := make([]*Doer, 0)
 	for _, a := range t.Actions {
-		raw, err := enrich(a, vars)
+		raw, err := enrich(a, vars(t.Vars))
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to enrich action")
 		}
@@ -96,15 +84,4 @@ func (t *Target) PrepDoers() ([]*Doer, error) {
 	}
 
 	return doers, nil
-}
-
-func enrich(content string, vars interface{}) (string, error) {
-	tpl := template.Must(template.New("cmd").Parse(content))
-
-	var buf bytes.Buffer
-	if err := tpl.Execute(&buf, vars); err != nil {
-		return "", errors.Wrap(err, "unable to execute text template")
-	}
-
-	return buf.String(), nil
 }
