@@ -6,9 +6,7 @@ package honey
 
 import (
 	"bytes"
-	"strings"
 	"text/template"
-	"time"
 
 	"github.com/elliottpolk/honey-do/log"
 
@@ -18,10 +16,11 @@ import (
 type Target struct {
 	ran bool
 
-	Description string            `json:"description,omitempty" yaml:"description,omitempty"`
-	Deps        []string          `json:"deps,omitempty" yaml:"deps,omitempty"`
-	Actions     []string          `json:"actions,omitempty" yaml:"actions,omitempty"`
-	Vars        map[string]string `json:"vars,omitempty" yaml:"vars,omitempty"`
+	Description string               `json:"description,omitempty" yaml:"description,omitempty"`
+	Deps        []string             `json:"deps,omitempty" yaml:"deps,omitempty"`
+	Platforms   map[string]*Platform `json:"platforms,omitempty" yaml:"platforms,omitempty"`
+	Actions     []string             `json:"actions,omitempty" yaml:"actions,omitempty"`
+	Vars        map[string]string    `json:"vars,omitempty" yaml:"vars,omitempty"`
 }
 
 func (t *Target) Run() error {
@@ -37,36 +36,21 @@ func (t *Target) Run() error {
 		return errors.Wrap(err, "unable to run deps")
 	}
 
+	for n, p := range t.Platforms {
+		p.os = n
+		if err := p.Run(); err != nil {
+			return errors.Wrap(err, "unable to run platform")
+		}
+	}
+
 	doers, err := t.PrepDoers()
 	if err != nil {
-		return errors.Wrap(err, "unable to prep actions")
+		return errors.Wrap(err, "unable to prep target actions")
 	}
 
 	for _, d := range doers {
-		d.start = time.Now()
-
-		var (
-			stdout bytes.Buffer
-			stderr bytes.Buffer
-		)
-
-		cmd := d.Cmd
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
-
-		err := cmd.Run()
-		d.finish = time.Now()
-
-		if out := stdout.String(); len(out) > 0 {
-			log.Info(out)
-		}
-
-		if err != nil {
-			if err := stderr.String(); len(err) > 0 {
-				log.NewError("%s", strings.TrimSpace(err))
-			}
-
-			return errors.Wrapf(err, "unable to run command %s", d.Raw)
+		if err := d.Do(); err != nil {
+			return errors.Wrap(err, "unable to run target action")
 		}
 	}
 

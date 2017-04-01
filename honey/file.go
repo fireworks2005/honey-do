@@ -1,6 +1,6 @@
 //  Created by Elliott Polk on 31/03/2017
 //  Copyright © 2017. All rights reserved.
-//  honey-do/honey/honey.go
+//  honey-do/honey/file.go
 //
 package honey
 

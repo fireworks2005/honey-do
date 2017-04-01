@@ -5,12 +5,32 @@ vars:
   BIN: "honey"
 
 targets:
+  
+
   build:
     deps: 
       - test
     actions:
       - echo -n "hello {{.BIN}}"
       - echo -n "{{.DERP}}"
+    platforms:
+      "!windows":
+        actions:
+          - echo -n "hello for {{.DERP}}"
+        vars:
+          DERP: "not windows"
+
+      windows:
+        actions:
+          - echo -n "hello for {{.DERP}}"
+        vars:
+          DERP: "windows"
+
+      darwin:
+        actions:
+          - echo -n "hello for {{.DERP}}"
+        vars:
+          DERP: "macOS"
 
   test:
     actions:
