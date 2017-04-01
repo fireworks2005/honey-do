@@ -24,6 +24,8 @@ func Command(cmd string) *Cmd {
 	c := &Cmd{exec.Command(shell, "-c", cmd)}
 	c.Env = os.Environ()
 	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
 
 	return c
 }

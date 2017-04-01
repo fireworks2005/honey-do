@@ -25,6 +25,8 @@ func Command(name string, args ...string) *Cmd {
 	c := &Cmd{exec.Command(shell, "-c", name, args...)}
 	c.Env = os.Environ()
 	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
 
 	if !exists {
 		c.Cmd = exec.Command("cmd", "/C", name, args...)
