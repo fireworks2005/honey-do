@@ -6,7 +6,10 @@
 //
 package exec
 
-import "os/exec"
+import (
+	"os"
+	"os/exec"
+)
 
 var shell string
 
@@ -18,5 +21,9 @@ func init() {
 }
 
 func Command(cmd string) *Cmd {
-	return &Cmd{exec.Command(shell, "-c", cmd)}
+	c := &Cmd{exec.Command(shell, "-c", cmd)}
+	c.Env = os.Environ()
+	c.Stdin = os.Stdin
+
+	return c
 }
